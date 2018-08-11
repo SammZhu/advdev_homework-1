@@ -17,12 +17,12 @@
 
     // Checkout Source Code
     stage('Checkout Source') {
-    git url: 'https://github.com/carl-durrant/advdev_homework/MLBParks'
+      git url: 'https://github.com/carl-durrant/advdev_homework/MLBParks.git'
     }    
     // Using Maven build the war file
     stage('Build war') {
-    echo "Building version ${devTag}"
-    sh "${mvnCmd} clean package -DskipTests"
+      echo "Building version ${devTag}"
+      sh "${mvnCmd} clean package -DskipTests"
     }
   }
 }
