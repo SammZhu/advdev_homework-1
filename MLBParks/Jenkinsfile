@@ -15,23 +15,9 @@
 ) {
   node('mlbparks-build') {
 
-    // Your Pipeline Code goes here. Make sure to use the ${GUID} and ${CLUSTER} parameters where appropriate
-    // You need to build the application in directory `MLBParks`.
-    // Also copy "../nexus_settings.xml" to your build directory
-    // and replace 'GUID' in the file with your ${GUID} to point to >your< Nexus instance
-
-    // Define Maven command and set correct POM file
-    def mvnCmd = "mvn -s ./pom.xml"
-
-    // Set the tag for the development image: version + build number
-    def devTag = "${version}-${BUILD_NUMBER}"
-    // Set the tag for the production image: version
-    def prodTag = "${version}"
-
     // Checkout Source Code
     stage('Checkout Source') {
     git url: 'https://github.com/carl-durrant/advdev_homework/MLBParks'
-   
     }    
     // Using Maven build the war file
     stage('Build war') {
