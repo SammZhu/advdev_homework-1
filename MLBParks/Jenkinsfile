@@ -38,4 +38,5 @@
     echo "Building version ${devTag}"
     sh "${mvnCmd} clean package -DskipTests"
     }
+  }
 }
