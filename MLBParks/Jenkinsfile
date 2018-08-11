@@ -19,9 +19,9 @@
     def mvnCmd = "mvn -s ./nexus_settings.xml"
 
     // Extract version and other properties from the pom.xml
-    def groupId    = getGroupIdFromPom("./MLBParks/pom.xml")
-    def artifactId = getArtifactIdFromPom("./MLBParks/pom.xml")
-    def version    = getVersionFromPom("./MLBParks/pom.xml")
+    def groupId    = getGroupIdFromPom("MLBParks/pom.xml")
+    def artifactId = getArtifactIdFromPom("MLBParks/pom.xml")
+    def version    = getVersionFromPom("MLBParks/pom.xml")
 
     // Set the tag for the development image: version + build number
     def devTag = "${version}-${BUILD_NUMBER}"
