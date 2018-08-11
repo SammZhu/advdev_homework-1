@@ -15,7 +15,7 @@
 ) {
   node('mlbparks-build') {
 
-    // Define maven command
+    // Define location of the Nexus setting file 
     def mvnCmd = "mvn -s ./nexus_settings.xml"
 
     // Extract version and other properties from the pom.xml
@@ -39,4 +39,18 @@
       sh "${mvnCmd} clean package -DskipTests"
     }
   }
-  }
+
+// Convenience Functions to read variables from the pom.xml
+// --------------------------------------------------------
+def getVersionFromPom(pom) {
+  def matcher = readFile(pom) =~ '<version>(.+)</version>'
+  matcher ? matcher[0][1] : null
+}
+def getGroupIdFromPom(pom) {
+  def matcher = readFile(pom) =~ '<groupId>(.+)</groupId>'
+  matcher ? matcher[0][1] : null
+}
+def getArtifactIdFromPom(pom) {
+  def matcher = readFile(pom) =~ '<artifactId>(.+)</artifactId>'
+  matcher ? matcher[0][1] : null
+}
