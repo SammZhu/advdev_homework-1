@@ -18,11 +18,6 @@
     // Define location of the Nexus setting file 
     def mvnCmd = "mvn -s ./nexus_settings.xml"
 
-    // Extract version and other properties from the pom.xml
-    def groupId    = getGroupIdFromPom("MLBParks/pom.xml")
-    def artifactId = getArtifactIdFromPom("MLBParks/pom.xml")
-    def version    = getVersionFromPom("MLBParks/pom.xml")
-
     // Set the tag for the development image: version + build number
     def devTag = "${version}-${BUILD_NUMBER}"
 
@@ -36,22 +31,7 @@
     // Using Maven build the war file
     stage('Build war') {
       echo "Building version ${devTag}"
-      sh "${mvnCmd} clean package -DskipTests"
+      sh "${mvnCmd} -f MLBParks/pom.xml clean package -DskipTests"
     }
   }
   }
-
-// Convenience Functions to read variables from the pom.xml
-// --------------------------------------------------------
-def getVersionFromPom(pom) {
-  def matcher = readFile(pom) =~ '<version>(.+)</version>'
-  matcher ? matcher[0][1] : null
-}
-def getGroupIdFromPom(pom) {
-  def matcher = readFile(pom) =~ '<groupId>(.+)</groupId>'
-  matcher ? matcher[0][1] : null
-}
-def getArtifactIdFromPom(pom) {
-  def matcher = readFile(pom) =~ '<artifactId>(.+)</artifactId>'
-  matcher ? matcher[0][1] : null
-}
