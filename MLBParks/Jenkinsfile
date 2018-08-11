@@ -22,7 +22,6 @@
 
     // Define Maven command and set correct POM file
     def mvnCmd = "mvn -s ./pom.xml"
-    Final
 
     // Set the tag for the development image: version + build number
     def devTag = "${version}-${BUILD_NUMBER}"
