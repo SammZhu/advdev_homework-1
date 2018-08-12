@@ -23,9 +23,8 @@
 
     }    
     // Using Maven build the war file
-    stage('Build war') {
-      echo "Building war"
-      sh wait 1200   
+    stage('Print POM') {
+      cat ./MLBParks/pom.xml  
     }
   }
 }
