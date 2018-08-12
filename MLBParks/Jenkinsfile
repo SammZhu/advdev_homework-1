@@ -13,25 +13,34 @@
     )
   ]
 ) {
-  node('mlbparks-build') {
+  pipeline {
+      agent ('mlbparks-build') {
 
-    // Define location of the Nexus setting file 
-    def mvnCmd = "mvn -s ./nexus_settings.xml"
+      // Define location of the Nexus setting file 
+      def mvnCmd = "mvn -s ./nexus_settings.xml"
 
-    // Set the tag for the development image: version + build number
-    def devTag = "${version}-${BUILD_NUMBER}"
+      // Set the tag for the development image: version + build number
+      def devTag = "${version}-${BUILD_NUMBER}"
 
-    // Set the tag for the production image: version
-    def prodTag = "${version}"
+      // Set the tag for the production image: version
+      def prodTag = "${version}"
 
-    // Checkout Source Code
-    stage('Checkout Source') {
-      git url: 'https://github.com/carl-durrant/advdev_homework.git'
-    }    
-    // Using Maven build the war file
-    stage('Build war') {
-      echo "Building version ${devTag}"
-      sh "${mvnCmd} -f ./advdev_homework/MLBParks/pom.xml clean package -DskipTests"
-    }
+      // Checkout Source Code
+      stages
+          stage('Checkout Source') {
+              steps {
+                  git url: 'https://github.com/carl-durrant/advdev_homework.git'
+              }
+          }
+
+          // Using Maven build the war file
+          stage('Build war') {
+              steps {  
+                  echo "Building version ${devTag}"
+                  sh "${mvnCmd} -f ./advdev_homework/MLBParks/pom.xml clean package -DskipTests"
+              }
+          }
+      }
   }
-  }
+
+}
