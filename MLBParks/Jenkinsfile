@@ -17,6 +17,8 @@
 ) {
   node('mlbparks-build') {
 
+    def mvnCmd = "mvn -s ./advdev_homework/nexus_settings.xml"
+
     // Checkout Source Code
     stage('Checkout Source') {
       git url: 'https://github.com/carl-durrant/advdev_homework.git'
