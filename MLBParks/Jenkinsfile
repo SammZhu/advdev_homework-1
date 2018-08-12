@@ -24,11 +24,6 @@
     // Set the tag for the production image: version
     def prodTag = "${version}"
 
-    // Extract version and other properties from the pom.xml
-    def groupId    = getGroupIdFromPom("./advdev_homework/MLBParks/pom.xml")
-    def artifactId = getArtifactIdFromPom("./advdev_homework/MLBParks/pom.xml")
-    def version    = getVersionFromPom("./advdev_homework/MLBParks/pom.xml")
-
     // Checkout Source Code
     stage('Checkout Source') {
       git url: 'https://github.com/carl-durrant/advdev_homework.git'
@@ -40,19 +35,3 @@
     }
   }
   }
-
-// Convenience Functions to read variables from the pom.xml
-// Do not change anything below this line.
-// --------------------------------------------------------
-def getVersionFromPom(pom) {
-  def matcher = readFile(pom) =~ '<version>(.+)</version>'
-  matcher ? matcher[0][1] : null
-}
-def getGroupIdFromPom(pom) {
-  def matcher = readFile(pom) =~ '<groupId>(.+)</groupId>'
-  matcher ? matcher[0][1] : null
-}
-def getArtifactIdFromPom(pom) {
-  def matcher = readFile(pom) =~ '<artifactId>(.+)</artifactId>'
-  matcher ? matcher[0][1] : null
-}
