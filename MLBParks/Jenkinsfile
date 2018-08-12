@@ -24,7 +24,7 @@
     }    
     // Using Maven build the war file
     stage('Print POM') {
-      sh cat "./MLBParks/pom.xml"  
+      cat './MLBParks/pom.xml'  
     }
   }
 }
