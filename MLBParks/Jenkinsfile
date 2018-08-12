@@ -20,17 +20,17 @@
     // Define Maven command
     def mvnCmd = "mvn -s ./nexus_settings.xml"
 
-    // The following variables need to be defined at the top level
-    // and not inside the scope of a stage - otherwise they would not
-    // be accessible from other stages.
-    // Extract version and other properties from the pom.xml
-    def groupId = getGroupIdFromPom("./MLBParks/pom.xml")
-    def artifactId = getArtifactIdFromPom("./MLBParks/pom.xml")
-    def version = getVersionFromPom("./MLBParks/pom.xml")
-
     // Checkout Source Code
     stage('Checkout Source') {
       git url: 'https://github.com/carl-durrant/advdev_homework.git'
+
+      // The following variables need to be defined at the top level
+      // and not inside the scope of a stage - otherwise they would not
+      // be accessible from other stages.
+      // Extract version and other properties from the pom.xml
+      def groupId = getGroupIdFromPom("./MLBParks/pom.xml")
+      def artifactId = getArtifactIdFromPom("./MLBParks/pom.xml")
+      def version = getVersionFromPom("./MLBParks/pom.xml")
 
     }    
     // Using Maven build the war file
