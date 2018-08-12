@@ -20,12 +20,6 @@
     // Define location of the Nexus setting file 
     def mvnCmd = "mvn -s ./advdev_homework/nexus_settings.xml"
 
-    // Set the tag for the development image: version + build number
-    def devTag = "${version}-${BUILD_NUMBER}"
-
-    // Set the tag for the production image: version
-    def prodTag = "${version}"
-
     // Checkout Source Code
     stage('Checkout Source') {
       git url: 'https://github.com/carl-durrant/advdev_homework.git'
