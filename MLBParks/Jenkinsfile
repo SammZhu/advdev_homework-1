@@ -21,18 +21,12 @@
     stage('Checkout Source') {
       git url: 'https://github.com/carl-durrant/advdev_homework.git'
 
-    def dir = "./MLBParks"
-    def groupId = getGroupIdFromPom("$dir/pom.xml")
-
     }    
     // Using Maven build the war file
     stage('Build war') {
       echo "Building war"
+      pwd
+      ls -l
     }
   }
-}
-
-def getArtifactIdFromPom(pom) {
-  def matcher = readFile(pom) =~ '<artifactId>(.+)</artifactId>'
-  matcher ? matcher[0][1] : null
 }
