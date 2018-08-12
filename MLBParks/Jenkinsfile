@@ -17,7 +17,13 @@
 ) {
   node('mlbparks-build') {
 
+    // Define maven command to use Nexus
     def mvnCmd = "mvn -s ./advdev_homework/nexus_settings.xml"
+
+    // Extract version and other properties from the pom.xml
+    def groupId    = getGroupIdFromPom("./advdev_homework/pom.xml")
+    def artifactId = getArtifactIdFromPom("./advdev_homework/pom.xml")
+    def version    = getVersionFromPom("./advdev_homework/pom.xml")
 
     // Checkout Source Code
     stage('Checkout Source') {
