@@ -25,8 +25,7 @@
     // Using Maven build the war file
     stage('Build war') {
       echo "Building war"
-      pwd
-      ls -l
+      sh wait 1200   
     }
   }
 }
