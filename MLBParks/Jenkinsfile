@@ -25,9 +25,9 @@
       git url: 'https://github.com/carl-durrant/advdev_homework.git'
 
       // Extract version and other properties from the pom.xml
-    def groupId    = getGroupIdFromPom("pom.xml")
-    def artifactId = getArtifactIdFromPom("pom.xml")
-    def version    = getVersionFromPom("pom.xml")
+    def groupId    = getGroupIdFromPom("${workspace}/advdev_homework/MLBParks/pom.xml")
+    def artifactId = getArtifactIdFromPom("${workspace}/advdev_homework/MLBParks/pom.xml")
+    def version    = getVersionFromPom("${workspace}/advdev_homework/MLBParks/pom.xml")
 
     }    
     // Using Maven build the war file
