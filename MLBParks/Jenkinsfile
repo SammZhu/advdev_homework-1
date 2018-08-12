@@ -14,7 +14,7 @@
       resourceLimitMemory: "2Gi"
     )
   ]
-) }
+) {
   node('mlbparks-build') {
 
     // Checkout Source Code
@@ -26,5 +26,5 @@
       echo "Building version"
     }
   }
-  }
+}
   
