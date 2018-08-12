@@ -14,7 +14,7 @@
       resourceLimitMemory: "2Gi"
     )
   ]
-) 
+) }
   node('mlbparks-build') {
 
     // Checkout Source Code
@@ -23,8 +23,8 @@
     }    
     // Using Maven build the war file
     stage('Build war') {
-      echo "Building version ${devTag}"
-      sh "${mvnCmd} -f ./advdev_homework/MLBParks/pom.xml clean package -DskipTests"
+      echo "Building version"
     }
+  }
   }
   
