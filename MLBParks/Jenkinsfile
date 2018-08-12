@@ -17,6 +17,9 @@
 ) {
   node('mlbparks-build') {
 
+    def dir = "./MLParks"
+    def groupId = getGroupIdFromPom("$dir/pom.xml")
+
     // Checkout Source Code
     stage('Checkout Source') {
       git url: 'https://github.com/carl-durrant/advdev_homework.git'
@@ -24,9 +27,12 @@
     }    
     // Using Maven build the war file
     stage('Build war') {
-      echo "Exposing workspace"
-      cd ${workspace}
-      ls -l
+      echo "Building war"
     }
   }
+}
+
+def getArtifactIdFromPom(pom) {
+  def matcher = readFile(pom) =~ '<artifactId>(.+)</artifactId>'
+  matcher ? matcher[0][1] : null
 }
