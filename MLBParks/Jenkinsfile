@@ -14,11 +14,8 @@
       resourceLimitMemory: "2Gi"
     )
   ]
-) {
+) 
   node('mlbparks-build') {
-
-    // Define location of the Nexus setting file 
-    def mvnCmd = "mvn -s ./advdev_homework/nexus_settings.xml"
 
     // Checkout Source Code
     stage('Checkout Source') {
@@ -30,4 +27,4 @@
       sh "${mvnCmd} -f ./advdev_homework/MLBParks/pom.xml clean package -DskipTests"
     }
   }
-  }
+  
