@@ -17,38 +17,16 @@
 ) {
   node('mlbparks-build') {
 
-    // Define maven command to use Nexus
-    def mvnCmd = "mvn -s ./advdev_homework/nexus_settings.xml"
-
     // Checkout Source Code
     stage('Checkout Source') {
       git url: 'https://github.com/carl-durrant/advdev_homework.git'
 
-      // Extract version and other properties from the pom.xml
-    def groupId    = getGroupIdFromPom("${workspace}/advdev_homework/MLBParks/pom.xml")
-    def artifactId = getArtifactIdFromPom("${workspace}/advdev_homework/MLBParks/pom.xml")
-    def version    = getVersionFromPom("${workspace}/advdev_homework/MLBParks/pom.xml")
-
     }    
     // Using Maven build the war file
     stage('Build war') {
-      echo "Building version"
+      echo "Exposing workspace"
+      cd ${workspace}
+      ls -l
     }
   }
-}
-
-// Convenience Functions to read variables from the pom.xml
-// Do not change anything below this line.
-// --------------------------------------------------------
-def getVersionFromPom(pom) {
-  def matcher = readFile(pom) =~ '<version>(.+)</version>'
-  matcher ? matcher[0][1] : null
-}
-def getGroupIdFromPom(pom) {
-  def matcher = readFile(pom) =~ '<groupId>(.+)</groupId>'
-  matcher ? matcher[0][1] : null
-}
-def getArtifactIdFromPom(pom) {
-  def matcher = readFile(pom) =~ '<artifactId>(.+)</artifactId>'
-  matcher ? matcher[0][1] : null
 }
