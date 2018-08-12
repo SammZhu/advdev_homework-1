@@ -20,10 +20,6 @@
     // Define Maven command
     def mvnCmd = "mvn -s ./nexus_settings.xml"
 
-    def groupId    = getGroupIdFromPom("./MLBParks/pom.xml")
-    def artifactId = getArtifactIdFromPom("./MLBParks/pom.xml")
-    def version    = getVersionFromPom("./MLBParks/pom.xml")
-
     // Set the tag for the development image: version + build number
     def devTag  = "${version}-${BUILD_NUMBER}"
     // Set the tag for the production image: version
