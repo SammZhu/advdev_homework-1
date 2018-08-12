@@ -17,7 +17,7 @@
 ) {
   node('mlbparks-build') {
 
-    def dir = "./MLParks"
+    def dir = "./MLBParks"
     def groupId = getGroupIdFromPom("$dir/pom.xml")
 
     // Checkout Source Code
