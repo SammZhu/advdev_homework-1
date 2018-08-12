@@ -17,12 +17,12 @@
 ) {
   node('mlbparks-build') {
 
-    def dir = "./MLBParks"
-    def groupId = getGroupIdFromPom("$dir/pom.xml")
-
     // Checkout Source Code
     stage('Checkout Source') {
       git url: 'https://github.com/carl-durrant/advdev_homework.git'
+
+    def dir = "./MLBParks"
+    def groupId = getGroupIdFromPom("$dir/pom.xml")
 
     }    
     // Using Maven build the war file
