@@ -51,13 +51,13 @@
     // Using Maven call SonarQube for Code Analysis
     stage('Code Analysis') {
       echo "Running Code Analysis"
-      sh "${mvnCmd} sonar:sonar -Dsonar.host.url=sonarqube-cpd-sonarqube.apps.na39.openshift.opentlc.com -Dsonar.projectName=${JOB_BASE_NAME}-${devTag}"
+      sh "${mvnCmd} -f ./MLBParks/pom.xml admin:Chocolate -Dsonar.host.url=sonarqube-cpd-sonarqube.apps.na39.openshift.opentlc.com -Dsonar.projectName=${JOB_BASE_NAME}-${devTag}"
   }
 
     // Publish the built war file to Nexus
     stage('Publish to Nexus') {
       echo "Publish to Nexus"
-      sh "${mvnCmd} deploy -DskipTests=true -DaltDeploymentRepository=nexus::default::http://nexus3.cpd-nexus.svc.cluster.local:8081/repository/releases"
+      sh "${mvnCmd} -f ./MLBParks/pom.xml deploy -DskipTests=true -DaltDeploymentRepository=nexus::default::http://nexus3.cpd-nexus.svc.cluster.local:8081/repository/releases"
   }
   }
 }
