@@ -60,6 +60,21 @@
       echo "Publish to Nexus"
       sh "${mvnCmd} -f ./MLBParks/pom.xml deploy -DskipTests=true -DaltDeploymentRepository=nexus::default::http://nexus3.cpd-nexus.svc.cluster.local:8081/repository/releases"
   }
+
+    // Build the OpenShift Image in OpenShift
+    stage('Build and Tag OpenShift Image') {
+    echo "Building OpenShift container image tasks:${devTag}"
+    // Start Binary Build in OpenShift using the file we just published
+    sh "oc start-build tasks --follow --fromfile=./target/mlbparks-${version}.war -n cpd-parks-dev"
+
+    // Tag the image using the devTag
+    openshiftTag alias: 'false', destStream: 'tasks',
+    destTag: devTag, destinationNamespace: 'cpd-parks-dev',
+    namespace: 'cpd-parks-dev', srcStream: 'tasks', srcTag:
+    'latest', verbose: 'false'
+  }
+
+
   }
 }
 
