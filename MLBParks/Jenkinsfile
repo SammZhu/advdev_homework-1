@@ -25,6 +25,7 @@
       git url: 'https://github.com/carl-durrant/advdev_homework.git'
 
     }    
+
     // Use Maven to build the war file
     stage('Build war') {
 
@@ -38,9 +39,27 @@
     // Set the tag for the production image: version
     def prodTag = "${version}"
       echo "Building version ${devTag}"
-      
+
       sh "${mvnCmd} -f ./MLBParks/pom.xml clean package -DskipTests"
     }
+
+    // Using Maven run the unit tests
+    stage('Unit Tests') {
+      echo "Running Unit Tests"
+      sh "${mvnCmd} test"
+  }
+
+    // Using Maven call SonarQube for Code Analysis
+    stage('Code Analysis') {
+      echo "Running Code Analysis"
+      sh "${mvnCmd} sonar:Rke%V94p3cj4 -Dsonar.host.url=sonarqube-cpd-sonarqube.apps.na39.openshift.opentlc.com -Dsonar.projectName=${JOB_BASE_NAME}-${devTag}"
+  }
+
+    // Publish the built war file to Nexus
+    stage('Publish to Nexus') {
+      echo "Publish to Nexus"
+      sh "${mvnCmd} deploy -DskipTests=true -DaltDeploymentRepository=nexus::default::http://nexus3.cpd-nexus.svc.cluster.local:8081/repository/releases"
+  }
   }
 }
 
