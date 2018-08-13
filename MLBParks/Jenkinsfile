@@ -51,7 +51,7 @@
     // Using Maven call SonarQube for Code Analysis
     stage('Code Analysis') {
       echo "Running Code Analysis"
-      sh "${mvnCmd} -f ./MLBParks/pom.xml admin:Chocolate -Dsonar.host.url=sonarqube-cpd-sonarqube.apps.na39.openshift.opentlc.com -Dsonar.projectName=${JOB_BASE_NAME}-${devTag}"
+      sh "${mvnCmd} -f ./MLBParks/pom.xml sonar:Fb#@G6D#$KN7 -Dsonar.host.url=sonarqube-cpd-sonarqube.apps.na39.openshift.opentlc.com -Dsonar.projectName=${JOB_BASE_NAME}-${devTag}"
   }
 
     // Publish the built war file to Nexus
