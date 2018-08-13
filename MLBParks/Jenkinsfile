@@ -46,7 +46,7 @@
     // Using Maven run the unit tests
     stage('Unit Tests') {
       echo "Running Unit Tests"
-      sh "${mvnCmd} test"
+      sh "${mvnCmd} -f ./MLBParks/pom.xml test"
   }
 
     // Using Maven call SonarQube for Code Analysis
