@@ -24,7 +24,11 @@
     stage('Checkout Source') {
       git url: 'https://github.com/carl-durrant/advdev_homework.git'
 
-    // Extract version and other properties from the pom.xml
+    }    
+    // Use Maven to build the war file
+    stage('Build war') {
+
+      // Extract version and other properties from the pom.xml
     def groupId = getGroupIdFromPom("./MLBParks/pom.xml")
     def artifactId = getArtifactIdFromPom("./MLBParks/pom.xml")
     def version = getVersionFromPom("./MLBParks/pom.xml")
@@ -34,10 +38,7 @@
     // Set the tag for the production image: version
     def prodTag = "${version}"
       echo "Building version ${devTag}"
-
-    }    
-    // Use Maven to build the war file
-    stage('Build war') {
+      
       sh "${mvnCmd} -f ./MLBParks/pom.xml clean package -DskipTests"
     }
   }
