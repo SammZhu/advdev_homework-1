@@ -26,10 +26,7 @@
 
     }    
 
-    // Use Maven to build the war file
-    stage('Build war') {
-
-      // Extract version and other properties from the pom.xml
+     // Extract version and other properties from the pom.xml
     def groupId = getGroupIdFromPom("./MLBParks/pom.xml")
     def artifactId = getArtifactIdFromPom("./MLBParks/pom.xml")
     def version = getVersionFromPom("./MLBParks/pom.xml")
@@ -38,15 +35,17 @@
     def devTag = "${version}-${BUILD_NUMBER}"
     // Set the tag for the production image: version
     def prodTag = "${version}"
-      echo "Building version ${devTag}"
 
+    // Use Maven to build the war file
+    stage('Build war') {
+      echo "Building version ${devTag}"
       sh "${mvnCmd} -f ./MLBParks/pom.xml clean package -DskipTests"
     }
 
     // Using Maven run the unit tests
     stage('Unit Tests') {
       echo "Running Unit Tests"
-      sh "${mvnCmd} -f ./MLBParks/pom.xml test"
+      sh "${mvnCmd} test"
   }
 
     // Using Maven call SonarQube for Code Analysis
