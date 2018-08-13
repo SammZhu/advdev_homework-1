@@ -65,7 +65,7 @@
     stage('Build and Tag OpenShift Image') {
     echo "Building OpenShift container image tasks:${devTag}"
     // Start Binary Build in OpenShift using the file we just published
-    sh "oc start-build tasks --follow --fromfile=./target/mlbparks-${version}.war -n cpd-parks-dev"
+    sh "oc start-build tasks --follow --from-file=./target/mlbparks-${version}.war -n cpd-parks-dev"
 
     // Tag the image using the devTag
     openshiftTag alias: 'false', destStream: 'tasks',
