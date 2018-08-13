@@ -37,7 +37,7 @@
     }    
     // Use Maven to build the war file
     stage('Build war') {
-      echo "Building version ${devTag}"
+      sh "${mvnCmd} clean package -DskipTests"
     }
   }
 }
