@@ -22,6 +22,7 @@
 
     // Checkout Source Code
     stage('Checkout Source') {
+      echo "Checking out Source Code"
       git url: 'https://github.com/carl-durrant/advdev_homework.git'
 
     }    
@@ -51,7 +52,7 @@
     // Using Maven call SonarQube for Code Analysis
     stage('Code Analysis') {
       echo "Running Code Analysis"
-      sh "${mvnCmd} -f ./MLBParks/pom.xml sonar:sonar -Dsonar.host.url=sonarqube-cpd-sonarqube.apps.na39.openshift.opentlc.com -Dsonar.projectName=${JOB_BASE_NAME}-${devTag}"
+      sh "${mvnCmd} -f ./MLBParks/pom.xml sonar:sonar -Dsonar.host.url=sonarqube -Dsonar.projectName=${JOB_BASE_NAME}-${devTag}"
   }
 
     // Publish the built war file to Nexus
