@@ -85,7 +85,7 @@
     // Deploy the development application
     openshiftDeploy depCfg: 'mlbparks', namespace: 'cpd-parks-dev', verbose: 'false', waitTime: '', waitUnit: 'sec'
     openshiftVerifyDeployment depCfg: 'mlbparks', namespace: 'cpd-parks-dev', replicaCount: '1', verbose: 'false', verifyReplicaCount: 'false', waitTime: '', waitUnit: 'sec'
-    openshiftVerifyService namespace: 'cpd-mlbparks-dev', svcName: 'mlbparks', verbose: 'false'
+    openshiftVerifyService namespace: 'cpd-parks-dev', svcName: 'mlbparks', verbose: 'false'
   }
 
   }
