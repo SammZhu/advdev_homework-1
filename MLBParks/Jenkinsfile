@@ -80,7 +80,7 @@
 
     // Update the Config Map which contains the config for the mlbparks application
     sh "oc delete configmap mlbparks-config -n cpd-parks-dev --ignore-not-found=true"
-    sh "oc create configmap mlbparks-config --from-literal=APPNAME="MLB Parks (Blue)" -n cpd-parks-dev"
+    sh "oc create configmap mlbparks-config --from-literal=APPNAME='MLB Parks (Blue)' -n cpd-parks-dev"
 
     // Deploy the development application
     openshiftDeploy depCfg: 'mlbparks', namespace: 'cpd-parks-dev', verbose: 'false', waitTime: '', waitUnit: 'sec'
