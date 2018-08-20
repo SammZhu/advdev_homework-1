@@ -80,9 +80,11 @@
 
     // Update the Config Map which contains the config for the mlbparks application
     sh "oc delete configmap mlbparks-config -n cpd-parks-dev --ignore-not-found=true"
+
     sh "oc create configmap mlbparks-config --from-literal=APPNAME='MLB Parks (Blue)' \
     --from-literal=DB_HOST=mongodb --from-literal=DB_NAME=parks --from-literal=DB_PASSWORD=mongodb \
     --from-literal=DB_PORT=27017 --from-literal=DB_USERNAME=mongodb -n cpd-parks-dev"
+    
     sh "oc set env dc/mlbparks --from=configmap/mlbparks-config"
 
     // Deploy the development application
