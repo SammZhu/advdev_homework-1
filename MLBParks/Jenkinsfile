@@ -21,7 +21,7 @@
     def mvnCmd = "mvn -s ./nexus_settings.xml"
 
     // Checkout Source Code
-    stage('Checkout Source') {
+    stage('Checkout Source code') {
       echo "Checking out Source Code"
       git url: 'https://github.com/carl-durrant/advdev_homework.git'
 
@@ -38,25 +38,25 @@
     def prodTag = "${version}"
 
     // Use Maven to build the war file
-    stage('Build war') {
+    stage('Build Java war') {
       echo "Building version ${devTag}"
       sh "${mvnCmd} -f ./MLBParks/pom.xml clean package -DskipTests"
     }
 
     // Using Maven run the unit tests
-    stage('Unit Tests') {
+    stage('Run Unit Tests') {
       echo "Running Unit Tests"
       sh "${mvnCmd} -f ./MLBParks/pom.xml test"
   }
 
     // Using Maven call SonarQube for Code Analysis
-    stage('Code Quality') {
+    stage('Check Code Quality') {
       echo "Running Code Analysis"
       sh "${mvnCmd} -f ./MLBParks/pom.xml sonar:sonar -Dsonar.host.url=http://sonarqube.cpd-sonarqube.svc.cluster.local:9000 -Dsonar.projectName=${JOB_BASE_NAME}-${devTag}"
   }
 
     // Publish the built war file to Nexus
-    stage('Publish to Nexus') {
+    stage('Publish Nexus artifact') {
       echo "Publish to Nexus"
       sh "${mvnCmd} -f ./MLBParks/pom.xml deploy -DskipTests=true -DaltDeploymentRepository=nexus::default::http://nexus3.cpd-nexus.svc.cluster.local:8081/repository/releases"
   }
@@ -99,7 +99,7 @@
   }
 
     // Run Integration Tests in the Development Environment.
-    stage('Integration Tests') {
+    stage('Run Integration Tests') {
     echo "Running Integration Tests"
     sleep 5
 
@@ -118,6 +118,48 @@
     // Replace cpd-tasks-dev with the name of your dev project
     openshiftTag alias: 'false', destStream: 'mlbparks', destTag: prodTag, destinationNamespace: 'cpd-parks-dev', namespace: 'cpd-parks-dev', srcStream: 'mlbparks', srcTag: devTag, verbose: 'false'
   }
+
+    // Blue/Green Deployment into Production
+    def destApp   = "mlbparks-green"
+    def cfgMap = "Green"
+    def activeApp = ""
+
+    stage('Blue/Green Production Deployment') {
+    // Deploy blue application alongside the green application 
+    activeApp = sh(returnStdout: true, script: "oc get route mlbparks -n cpd-mlbparks-prod -o jsonpath='{ .spec.to.name }'").trim()
+    if (activeApp == "mlbparks-green") {
+      destApp = "mlbparks-blue"
+      destcfgMap = "Blue"
+  }
+    echo "Active Application:      " + activeApp
+    echo "Destination Application: " + destApp
+    echo "Config Map to be used:   " + destcfgMap
+
+    // Update the Image on the Production Deployment Config
+    sh "oc set image dc/${destApp} ${destApp}=docker-registry.default.svc:5000/cpd-tasks-dev/mlbparks:${prodTag} -n cpd-tasks-prod"
+
+    // Update the Config Map to inactive green app
+    sh "oc delete configmap ${destApp}-config -n cpd-parks-prod --ignore-not-found=true"
+    sh "oc create configmap ${destApp}-config \
+                  --from-literal=APPNAME='MLB Parks (${destcfgMap})' \
+                  --from-literal=DB_HOST=mongodb \
+                  --from-literal=DB_NAME=parks \
+                  --from-literal=DB_PASSWORD=mongodb \
+                  --from-literal=DB_PORT=27017 \
+                  --from-literal=DB_USERNAME=mongodb \
+                  -n cpd-parks-prod"
+
+    // Deploy the inactive application
+    openshiftDeploy depCfg: destApp, namespace: 'cpd-parks-prod', verbose: 'false', waitTime: '', waitUnit: 'sec'
+    openshiftVerifyDeployment depCfg: destApp, namespace: 'cpd-parks-prod', replicaCount: '1', verbose: 'false', verifyReplicaCount: 'true', waitTime: '', waitUnit: 'sec'
+    openshiftVerifyService namespace: 'cpd-parks-prod', svcName: destApp, verbose: 'false'
+  }
+
+  stage('Switch over to new Version') {
+    echo "Switching Production application to ${destApp}."
+    sh 'oc patch route mlbparks -n cpd-parks-prod -p \'{"spec":{"to":{"name":"' + destApp + '"}}}\''
+  }
+
 
   }
 }
