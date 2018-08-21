@@ -56,7 +56,7 @@
   }
 
     // Publish the built war file to Nexus
-    stage('Publish Nexus artifact') {
+    stage('Publish Nexus Artifact') {
       echo "Publish to Nexus"
       sh "${mvnCmd} -f ./MLBParks/pom.xml deploy -DskipTests=true -DaltDeploymentRepository=nexus::default::http://nexus3.cpd-nexus.svc.cluster.local:8081/repository/releases"
   }
@@ -72,7 +72,7 @@
   }
 
     // Deploy the built image to the Development Environment
-    stage('Deploy to Dev') {
+    stage('Deploy to Dev stage') {
     echo "Deploying container image to Development Project"
 
     // Update the Image on the Development Deployment Config
@@ -101,7 +101,7 @@
     // Run Integration Tests in the Development Environment.
     stage('Run Integration Tests') {
     echo "Running Integration Tests"
-    sleep 5
+    sleep 3
 
     // 
     echo "Testing health endpoint"
@@ -126,7 +126,7 @@
 
     stage('Blue/Green Production Deployment') {
     // Deploy blue application alongside the green application 
-    activeApp = sh(returnStdout: true, script: "oc get route mlbparks -n cpd-mlbparks-prod -o jsonpath='{ .spec.to.name }'").trim()
+    activeApp = sh(returnStdout: true, script: "oc get route mlbparks -n cpd-parks-prod -o jsonpath='{ .spec.to.name }'").trim()
     if (activeApp == "mlbparks-green") {
       destApp = "mlbparks-blue"
       destcfgMap = "Blue"
