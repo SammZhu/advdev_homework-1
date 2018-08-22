@@ -136,7 +136,7 @@
     echo "Config Map to be used:   " + destcfgMap
 
     // Update the Image on the Production Deployment Config
-    sh "oc set image dc/${destApp} ${destApp}=docker-registry.default.svc:5000/cpd-parks-dev/mlbparks:${prodTag} -n cpd-tasks-prod"
+    sh "oc set image dc/${destApp} ${destApp}=docker-registry.default.svc:5000/cpd-parks-dev/mlbparks:${prodTag} -n cpd-parks-prod"
 
     // Update the Config Map to inactive green app
     sh "oc delete configmap ${destApp}-config -n cpd-parks-prod --ignore-not-found=true"
