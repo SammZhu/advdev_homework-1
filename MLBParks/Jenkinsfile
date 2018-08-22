@@ -21,10 +21,9 @@
     def mvnCmd = "mvn -s ./nexus_settings.xml"
 
     // Checkout Source Code
-    stage('Checkout Source code') {
+    stage('Checkout source code') {
       echo "Checking out Source Code"
       git url: 'https://github.com/carl-durrant/advdev_homework.git'
-
     }    
 
      // Extract version and other properties from the pom.xml
@@ -43,13 +42,13 @@
       sh "${mvnCmd} -f ./MLBParks/pom.xml clean package -DskipTests"
     }
 
-    // Using Maven run the unit tests
+    // Use Maven run the unit tests
     stage('Run Unit Tests') {
       echo "Running Unit Tests"
       sh "${mvnCmd} -f ./MLBParks/pom.xml test"
     }
 
-    // Using Maven call SonarQube for Code Analysis
+    // Use Maven call SonarQube for Code Analysis
     stage('Inspect Code Quality') {
       echo "Running Code Analysis"
       sh "${mvnCmd} -f ./MLBParks/pom.xml sonar:sonar -Dsonar.host.url=http://sonarqube.cpd-sonarqube.svc.cluster.local:9000 -Dsonar.projectName=${JOB_BASE_NAME}-${devTag}"
@@ -98,7 +97,7 @@
     openshiftVerifyService namespace: 'cpd-parks-dev', svcName: 'mlbparks', verbose: 'false'
     }
 
-    // Run Integration Tests in the Development Environment.
+    // Run Integration Tests in the Development Environment
     stage('Run Integration Test') {
     echo "Running Integration Tests"
     sleep 3
@@ -106,7 +105,6 @@
     // 
     echo "Testing health endpoint"
     sh "curl GET http://mlbparks.cpd-parks-dev.svc:8080/ws/healthz/"
-
     }
 
     // Copy Image to Nexus Docker Registry
@@ -141,7 +139,7 @@
     sh "oc delete configmap ${destApp}-config -n cpd-parks-prod --ignore-not-found=true"
     sh "oc create configmap ${destApp}-config \
                   --from-literal=APPNAME='MLB Parks (${destcfgMap})' \
-                  --from-literal=DB_HOST=mongodb \ 
+                  --from-literal=DB_HOST=mongodb \
                   --from-literal=DB_NAME=parks \
                   --from-literal=DB_PASSWORD=mongodb \
                   --from-literal=DB_PORT=27017 \
@@ -164,7 +162,6 @@
 }
 
 // Convenience Functions to read variables from the pom.xml
-// Do not change anything below this line.
 // --------------------------------------------------------
 def getVersionFromPom(pom) {
   def matcher = readFile(pom) =~ '<version>(.+)</version>'
