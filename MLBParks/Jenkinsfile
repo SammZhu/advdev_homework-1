@@ -120,7 +120,7 @@
   }
 
     // Blue/Green Deployment into Production
-    def destApp   = "mlbparks-green"
+    def destApp   = "parks-green"
     def destcfgMap = "Green"
     def activeApp = ""
 
