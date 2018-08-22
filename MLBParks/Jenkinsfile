@@ -121,7 +121,7 @@
 
     // Blue/Green Deployment into Production
     def destApp   = "mlbparks-green"
-    def cfgMap = "Green"
+    def destcfgMap = "Green"
     def activeApp = ""
 
     stage('Blue/Green Production Deployment') {
