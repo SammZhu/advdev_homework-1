@@ -138,7 +138,7 @@
     // Update the Image on the Production Deployment Config
     sh "oc set image dc/${destApp} ${destApp}=docker-registry.default.svc:5000/cpd-parks-dev/mlbparks:${prodTag} -n cpd-parks-prod"
 
-    // Update the Config Map to inactive green app
+    // Update the Config Map to the inactive
     sh "oc delete configmap ${destApp}-config -n cpd-parks-prod --ignore-not-found=true"
     sh "oc create configmap ${destApp}-config \
                   --from-literal=APPNAME='MLB Parks (${destcfgMap})' \
@@ -148,6 +148,8 @@
                   --from-literal=DB_PORT=27017 \
                   --from-literal=DB_USERNAME=mongodb \
                   -n cpd-parks-prod"
+
+    sh "oc set env dc/${destApp} --from=configmap/${destApp}-config -n cpd-parks-dev"               
 
     // Deploy the inactive application
     openshiftDeploy depCfg: destApp, namespace: 'cpd-parks-prod', verbose: 'false', waitTime: '', waitUnit: 'sec'
