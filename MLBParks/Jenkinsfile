@@ -47,19 +47,19 @@
     stage('Run Unit Tests') {
       echo "Running Unit Tests"
       sh "${mvnCmd} -f ./MLBParks/pom.xml test"
-  }
+    }
 
     // Using Maven call SonarQube for Code Analysis
     stage('Inspect Code Quality') {
       echo "Running Code Analysis"
       sh "${mvnCmd} -f ./MLBParks/pom.xml sonar:sonar -Dsonar.host.url=http://sonarqube.cpd-sonarqube.svc.cluster.local:9000 -Dsonar.projectName=${JOB_BASE_NAME}-${devTag}"
-  }
+    } 
 
     // Publish the built war file to Nexus
     stage('Publish Nexus Artifact') {
       echo "Publish to Nexus"
       sh "${mvnCmd} -f ./MLBParks/pom.xml deploy -DskipTests=true -DaltDeploymentRepository=nexus::default::http://nexus3.cpd-nexus.svc.cluster.local:8081/repository/releases"
-  }
+    }
 
     // Build the OpenShift Image in OpenShift
     stage('Build and Tag OpenShift Image') {
@@ -69,7 +69,7 @@
 
     // Tag the image using the devTag
     openshiftTag alias: 'false', destStream: 'mlbparks', destTag: devTag, destinationNamespace: 'cpd-parks-dev', namespace: 'cpd-parks-dev', srcStream: 'mlbparks', srcTag: 'latest', verbose: 'false'
-  }
+    }
 
     // Deploy the built image to the Development Environment
     stage('Verify deploy in Dev') {
@@ -96,7 +96,7 @@
     openshiftDeploy depCfg: 'mlbparks', namespace: 'cpd-parks-dev', verbose: 'false', waitTime: '', waitUnit: 'sec'
     openshiftVerifyDeployment depCfg: 'mlbparks', namespace: 'cpd-parks-dev', replicaCount: '1', verbose: 'false', verifyReplicaCount: 'false', waitTime: '', waitUnit: 'sec'
     openshiftVerifyService namespace: 'cpd-parks-dev', svcName: 'mlbparks', verbose: 'false'
-  }
+    }
 
     // Run Integration Tests in the Development Environment.
     stage('Run Integration Test') {
@@ -107,7 +107,7 @@
     echo "Testing health endpoint"
     sh "curl GET http://mlbparks.cpd-parks-dev.svc:8080/ws/healthz/"
 
-  }
+    }
 
     // Copy Image to Nexus Docker Registry
     stage('Copy Image to Nexus Docker Registry') {
@@ -116,7 +116,7 @@
 
     // Tag the built image with the production tag
     openshiftTag alias: 'false', destStream: 'mlbparks', destTag: prodTag, destinationNamespace: 'cpd-parks-dev', namespace: 'cpd-parks-dev', srcStream: 'mlbparks', srcTag: devTag, verbose: 'false'
-  }
+    }
 
     // Blue/Green Deployment into Production
     def destApp   = "parks-green"
@@ -129,7 +129,7 @@
     if (activeApp == "parks-green") {
       destApp = "parks-blue"
       destcfgMap = "Blue"
-  }
+    }
     echo "Active Application:      " + activeApp
     echo "Destination Application: " + destApp
     echo "Config Map to be used:   " + destcfgMap
@@ -154,14 +154,12 @@
     openshiftDeploy depCfg: destApp, namespace: 'cpd-parks-prod', verbose: 'false', waitTime: '', waitUnit: 'sec'
     openshiftVerifyDeployment depCfg: destApp, namespace: 'cpd-parks-prod', replicaCount: '1', verbose: 'false', verifyReplicaCount: 'true', waitTime: '', waitUnit: 'sec'
     openshiftVerifyService namespace: 'cpd-parks-prod', svcName: destApp, verbose: 'false'
-  }
+    }
 
-  stage('Switch route to new Version') {
+    stage('Switch route to new Version') {
     echo "Switching Production application to ${destApp}."
     sh 'oc patch route mlbparks -n cpd-parks-prod -p \'{"spec":{"to":{"name":"' + destApp + '"}}}\''
-  }
-
-
+    }
   }
 }
 
