@@ -143,7 +143,7 @@
     sh "oc create configmap ${destApp}-config \
                   --from-literal=APPNAME='MLB Parks (${destcfgMap})' \
                   --from-literal=DB_HOST=mongodb \
-                  --from-literal=DB_NAME=parks \
+                  --from-literal=DB_NAME=mongodb \
                   --from-literal=DB_PASSWORD=mongodb \
                   --from-literal=DB_PORT=27017 \
                   --from-literal=DB_USERNAME=mongodb \
