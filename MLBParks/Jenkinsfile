@@ -149,7 +149,7 @@
                   --from-literal=DB_USERNAME=mongodb \
                   -n cpd-parks-prod"
 
-    sh "oc set env dc/${destApp} --from=configmap/${destApp}-config -n cpd-parks-dev"               
+    sh "oc set env dc/${destApp} --from=configmap/${destApp}-config -n cpd-parks-prod"               
 
     // Deploy the inactive application
     openshiftDeploy depCfg: destApp, namespace: 'cpd-parks-prod', verbose: 'false', waitTime: '', waitUnit: 'sec'
