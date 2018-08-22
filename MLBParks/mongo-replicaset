@@ -30,7 +30,7 @@ spec:
               mountPath: "/var/lib/mongodb/data"
           env:
             - name: MONGODB_DATABASE
-              value: "parks"
+              value: "mongodb"
             - name: MONGODB_USER
               value: "mongodb"
             - name: MONGODB_PASSWORD
