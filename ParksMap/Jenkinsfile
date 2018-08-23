@@ -1,31 +1,143 @@
-// Jenkinsfile for ParksMap
-podTemplate(
-  label: "skopeo-pod",
-  cloud: "openshift",
+#!groovy
+
+// Jenkinsfile for Parksmap
+// Create a slave 
+  podTemplate(
+  label: "parksmap-build",
   inheritFrom: "maven",
+  cloud: "openshift",
   containers: [
     containerTemplate(
       name: "jnlp",
-      image: "docker-registry.default.svc:5000/${GUID}-jenkins/jenkins-slave-appdev",
+      image: "docker-registry.default.svc:5000/cpd-jenkins/maven-slave-pod",
       resourceRequestMemory: "1Gi",
       resourceLimitMemory: "2Gi"
     )
   ]
 ) {
-  node('skopeo-pod') {
-    echo "GUID: ${GUID}"
-    echo "CLUSTER: ${CLUSTER}"
+  node('parksmap-build') {
 
-    // Your Pipeline Code goes here. Make sure to use the ${GUID} and ${CLUSTER} parameters where appropriate
-    // You need to build the application in directory `ParksMap`.
-    // Also copy "../nexus_settings.xml" to your build directory
-    // and replace 'GUID' in the file with your ${GUID} to point to >your< Nexus instance
+    // Define Maven command
+    def mvnCmd = "mvn -s ./nexus_settings.xml"
 
+    // Checkout Source Code
+    stage('Checkout source code') {
+      echo "Checking out Source Code"
+      git url: 'https://github.com/carl-durrant/advdev_homework.git'
+    }    
+
+     // Extract version and other properties from the pom.xml
+    def groupId = getGroupIdFromPom("./ParksMap/pom.xml")
+    def artifactId = getArtifactIdFromPom("./ParksMap/pom.xml")
+    def version = getVersionFromPom("./ParksMap/pom.xml")
+
+    // Set the tag for the development image: version + build number
+    def devTag = "${version}-${BUILD_NUMBER}"
+    // Set the tag for the production image: version
+    def prodTag = "${version}"
+
+    // Use Maven to build the jar file
+    stage('Build Java jar') {
+      echo "Building version ${devTag}"
+      sh "${mvnCmd} -f ./ParksMap/pom.xml spring-boot:repackage -DskipTests -Dcom.redhat.xpaas.repo.redhatga"
+    }
+
+    // Use Maven run the unit tests
+    stage('Run Unit Tests') {
+      echo "Running Unit Tests"
+      sh "${mvnCmd} -f ./ParksMap/pom.xml test"
+    }
+
+    // Use Maven call SonarQube for Code Analysis
+    stage('Inspect Code Quality') {
+      echo "Running Code Analysis"
+      sh "${mvnCmd} -f ./ParksMap/pom.xml sonar:sonar -Dsonar.host.url=http://sonarqube.cpd-sonarqube.svc.cluster.local:9000 -Dsonar.projectName=${JOB_BASE_NAME}-${devTag}"
+    } 
+
+    // Publish the built jar file to Nexus
+    stage('Publish Nexus Artifact') {
+      echo "Publish to Nexus"
+      sh "${mvnCmd} -f ./ParksMap/pom.xml deploy -DskipTests=true -DaltDeploymentRepository=nexus::default::http://nexus3.cpd-nexus.svc.cluster.local:8081/repository/releases"
+    }
+
+    // Build the OpenShift Image in OpenShift
+    stage('Build and Tag OpenShift Image') {
+    echo "Building OpenShift container image tasks:${devTag}"
+    // Start Binary Build in OpenShift using the file we just published
+    sh "oc start-build parksmap --follow --from-file=http://nexus3.cpd-nexus.svc.cluster.local:8081/repository/releases/com/openshift/evg/roadshow/parksmap/${version}/parksmap-${version}.jar -n cpd-parks-dev"
+
+    // Tag the image using the devTag
+    openshiftTag alias: 'false', destStream: 'parksmap', destTag: devTag, destinationNamespace: 'cpd-parks-dev', namespace: 'cpd-parks-dev', srcStream: 'parksmap', srcTag: 'latest', verbose: 'false'
+    }
+
+    // Deploy the built image to the Development Environment
+    stage('Verify deploy in Dev') {
+    echo "Deploying container image to Development Project"
+
+    // Update the Image on the Development Deployment Config
+    sh "oc set image dc/parksmap parksmap=docker-registry.default.svc:5000/cpd-parks-dev/parksmap:${devTag} -n cpd-parks-dev"
+
+    // Deploy the development application
+    openshiftDeploy depCfg: 'parksmap', namespace: 'cpd-parks-dev', verbose: 'false', waitTime: '', waitUnit: 'sec'
+    openshiftVerifyDeployment depCfg: 'parksmap', namespace: 'cpd-parks-dev', replicaCount: '1', verbose: 'false', verifyReplicaCount: 'false', waitTime: '', waitUnit: 'sec'
+    openshiftVerifyService namespace: 'cpd-parks-dev', svcName: 'parksmap', verbose: 'false'
+    }
+
+    // Run Integration Tests in the Development Environment
+    stage('Run Integration Test') {
+    echo "Running Integration Tests"
+    sleep 3
+
+    // 
+    echo "Testing health endpoint"
+    sh "curl GET http://parksmap.cpd-parks-dev.svc:8080/ws/healthz/"
+    }
+
+    // Copy Image to Nexus Docker Registry
+    stage('Copy Image to Nexus Docker Registry') {
+    echo "Copy image to Nexus Docker Registry"
+    sh "skopeo copy --src-tls-verify=false --dest-tls-verify=false --src-creds openshift:\$(oc whoami -t) --dest-creds admin:admin123 docker://docker-registry.default.svc.cluster.local:5000/cpd-parks-dev/parksmap:${devTag} docker://nexus-registry.cpd-nexus.svc:5001/parksmap:${devTag}"
+
+    // Tag the built image with the production tag
+    openshiftTag alias: 'false', destStream: 'parksmap', destTag: prodTag, destinationNamespace: 'cpd-parks-dev', namespace: 'cpd-parks-dev', srcStream: 'parksmap', srcTag: devTag, verbose: 'false'
+    }
+
+    // Blue/Green Deployment into Production
+    def destApp   = "parksmap-green"
+    def destcfgMap = "Green"
+    def activeApp = ""
+
+    stage('Blue/Green Production Deployment') {
+    // Deploy the idle application alongside the active application 
+    activeApp = sh(returnStdout: true, script: "oc get route parksmap -n cpd-parks-prod -o jsonpath='{ .spec.to.name }'").trim()
+    if (activeApp == "parksmap-green") {
+      destApp = "parksmap-blue"
+      destcfgMap = "Blue"
+    }
+    echo "Active Application:      " + activeApp
+    echo "Destination Application: " + destApp
+    echo "Config Map to be used:   " + destcfgMap
+
+    // Update the Image on the Production Deployment Config
+    sh "oc set image dc/${destApp} ${destApp}=docker-registry.default.svc:5000/cpd-parks-dev/parksmap:${prodTag} -n cpd-parks-prod"
+
+    sh "oc set env dc/${destApp} --from=configmap/${destApp}-config -n cpd-parks-prod"               
+
+    // Deploy the inactive application
+    openshiftDeploy depCfg: destApp, namespace: 'cpd-parks-prod', verbose: 'false', waitTime: '', waitUnit: 'sec'
+    openshiftVerifyDeployment depCfg: destApp, namespace: 'cpd-parks-prod', replicaCount: '1', verbose: 'false', verifyReplicaCount: 'true', waitTime: '', waitUnit: 'sec'
+    openshiftVerifyService namespace: 'cpd-parks-prod', svcName: destApp, verbose: 'false'
+    }
+
+    stage('Switch route to new Version') {
+    echo "Switching Production application to ${destApp}."
+    sh 'oc patch route parksmap -n cpd-parks-prod -p \'{"spec":{"to":{"name":"' + destApp + '"}}}\''
+    }
   }
 }
 
 // Convenience Functions to read variables from the pom.xml
-// Do not change anything below this line.
+// --------------------------------------------------------
 def getVersionFromPom(pom) {
   def matcher = readFile(pom) =~ '<version>(.+)</version>'
   matcher ? matcher[0][1] : null
