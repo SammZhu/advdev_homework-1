@@ -39,7 +39,7 @@
     // Use Maven to build the jar file
     stage('Build Java jar') {
       echo "Building version ${devTag}"
-      sh "${mvnCmd} -f ./ParksMap/pom.xml spring-boot:repackage -DskipTests -Dcom.redhat.xpaas.repo.redhatga"
+      sh "${mvnCmd} -f ./ParksMap/pom.xml clean package spring-boot:repackage -DskipTests -Dcom.redhat.xpaas.repo.redhatga"
     }
 
     // Use Maven run the unit tests
