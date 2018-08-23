@@ -9,5 +9,5 @@ spec:
       ref: "master"
   strategy:
     jenkinsPipelineStrategy:
-       jenkinsfilePath: MLBParks/Jenkinsfile
+       jenkinsfilePath: ParksMap/Jenkinsfile
   
