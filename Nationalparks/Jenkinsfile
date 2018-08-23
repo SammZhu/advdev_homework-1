@@ -39,7 +39,7 @@
     // Use Maven to build the jar file
     stage('Build Java jar') {
       echo "Building version ${devTag}"
-      sh "${mvnCmd} -f ./Nationalparks/pom.xml clean package -DskipTests"
+      sh "${mvnCmd} -f ./Nationalparks/pom.xml clean package -Dmaven.test.skip=true"
     }
 
     // Use Maven run the unit tests
