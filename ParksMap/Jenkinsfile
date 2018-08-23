@@ -119,9 +119,7 @@
     echo "Config Map to be used:   " + destcfgMap
 
     // Update the Image on the Production Deployment Config
-    sh "oc set image dc/${destApp} ${destApp}=docker-registry.default.svc:5000/cpd-parks-dev/parksmap:${prodTag} -n cpd-parks-prod"
-
-    sh "oc set env dc/${destApp} --from=configmap/${destApp}-config -n cpd-parks-prod"               
+    sh "oc set image dc/${destApp} ${destApp}=docker-registry.default.svc:5000/cpd-parks-dev/parksmap:${prodTag} -n cpd-parks-prod"              
 
     // Deploy the inactive application
     openshiftDeploy depCfg: destApp, namespace: 'cpd-parks-prod', verbose: 'false', waitTime: '', waitUnit: 'sec'
