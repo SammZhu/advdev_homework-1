@@ -117,15 +117,15 @@
     }
 
     // Blue/Green Deployment into Production
-    def destApp   = "national-green"
+    def destApp   = "nationalparks-green"
     def destcfgMap = "Green"
     def activeApp = ""
 
     stage('Blue/Green Production Deployment') {
     // Deploy the idle application alongside the active application 
     activeApp = sh(returnStdout: true, script: "oc get route nationalparks -n cpd-parks-prod -o jsonpath='{ .spec.to.name }'").trim()
-    if (activeApp == "national-green") {
-      destApp = "national-blue"
+    if (activeApp == "nationalparks-green") {
+      destApp = "nationalparks-blue"
       destcfgMap = "Blue"
     }
     echo "Active Application:      " + activeApp
