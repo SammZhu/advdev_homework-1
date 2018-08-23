@@ -36,8 +36,8 @@
     // Set the tag for the production image: version
     def prodTag = "${version}"
 
-    // Use Maven to build the war file
-    stage('Build Java war') {
+    // Use Maven to build the jar file
+    stage('Build Java jar') {
       echo "Building version ${devTag}"
       sh "${mvnCmd} -f ./Nationalparks/pom.xml clean package -DskipTests"
     }
@@ -54,7 +54,7 @@
       sh "${mvnCmd} -f ./Nationalparks/pom.xml sonar:sonar -Dsonar.host.url=http://sonarqube.cpd-sonarqube.svc.cluster.local:9000 -Dsonar.projectName=${JOB_BASE_NAME}-${devTag}"
     } 
 
-    // Publish the built war file to Nexus
+    // Publish the built jar file to Nexus
     stage('Publish Nexus Artifact') {
       echo "Publish to Nexus"
       sh "${mvnCmd} -f ./Nationalparks/pom.xml deploy -DskipTests=true -DaltDeploymentRepository=nexus::default::http://nexus3.cpd-nexus.svc.cluster.local:8081/repository/releases"
@@ -64,7 +64,7 @@
     stage('Build and Tag OpenShift Image') {
     echo "Building OpenShift container image tasks:${devTag}"
     // Start Binary Build in OpenShift using the file we just published
-    sh "oc start-build nationalparks --follow --from-file=http://nexus3.cpd-nexus.svc.cluster.local:8081/repository/releases/com/openshift/evg/roadshow/nationalparks/${version}/nationalparks-${version}.war -n cpd-parks-dev"
+    sh "oc start-build nationalparks --follow --from-file=http://nexus3.cpd-nexus.svc.cluster.local:8081/repository/releases/com/openshift/evg/roadshow/nationalparks/${version}/nationalparks-${version}.jar -n cpd-parks-dev"
 
     // Tag the image using the devTag
     openshiftTag alias: 'false', destStream: 'nationalparks', destTag: devTag, destinationNamespace: 'cpd-parks-dev', namespace: 'cpd-parks-dev', srcStream: 'nationalparks', srcTag: 'latest', verbose: 'false'
