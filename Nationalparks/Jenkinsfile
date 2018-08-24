@@ -162,6 +162,7 @@
     stage('Switch route to new Version') {
     echo "Switching Production application to ${destApp}."
     sh 'oc patch route nationalparks -n cpd-parks-prod -p \'{"spec":{"to":{"name":"' + destApp + '"}}}\''
+    sh "oc delete svc ${activeApp} -n cpd-parks-prod"
     }
   }
 }
