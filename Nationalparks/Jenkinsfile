@@ -153,8 +153,7 @@
     openshiftVerifyDeployment depCfg: destApp, namespace: 'cpd-parks-prod', replicaCount: '1', verbose: 'false', verifyReplicaCount: 'true', waitTime: '', waitUnit: 'sec'
     openshiftVerifyService namespace: 'cpd-parks-prod', svcName: destApp, verbose: 'false'
 
-    // Delete and recreate the service so that the label selector is applied by the refresh of parksmap cache 
-    sh "oc delete svc ${destApp} -n cpd-parks-prod"
+    // Create the service so that the label selector is applied by the refresh of parksmap cache 
     sh "oc expose dc ${destApp} --port 8080 --labels=type=parksmap-backend -n cpd-parks-prod"
 
     }
