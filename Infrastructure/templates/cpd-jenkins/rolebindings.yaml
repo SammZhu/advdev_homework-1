@@ -1,0 +1,104 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  groupNames: null
+  kind: RoleBinding
+  metadata:
+    creationTimestamp: null
+    name: admin
+  roleRef:
+    name: admin
+  subjects:
+  - kind: User
+    name: carl.durrant-avocado.com.au
+  userNames:
+  - carl.durrant-avocado.com.au
+- apiVersion: v1
+  groupNames: null
+  kind: RoleBinding
+  metadata:
+    creationTimestamp: null
+    name: admin-0
+  roleRef:
+    name: admin
+  subjects:
+  - kind: User
+    name: carl.durrant-avocado.com.au-admin
+  userNames:
+  - carl.durrant-avocado.com.au-admin
+- apiVersion: v1
+  groupNames: null
+  kind: RoleBinding
+  metadata:
+    creationTimestamp: null
+    name: admin-1
+  roleRef:
+    name: admin
+  subjects:
+  - kind: User
+    name: carl.durrant-avocado.com.au
+  userNames:
+  - carl.durrant-avocado.com.au
+- apiVersion: v1
+  groupNames: null
+  kind: RoleBinding
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    labels:
+      app: jenkins-persistent
+      name: jenkins
+      template: jenkins-persistent-template
+    name: jenkins_edit
+  roleRef:
+    name: edit
+  subjects:
+  - kind: ServiceAccount
+    name: jenkins
+    namespace: cpd-jenkins
+  userNames:
+  - system:serviceaccount:cpd-jenkins:jenkins
+- apiVersion: v1
+  groupNames: null
+  kind: RoleBinding
+  metadata:
+    creationTimestamp: null
+    name: system:deployers
+  roleRef:
+    name: system:deployer
+  subjects:
+  - kind: ServiceAccount
+    name: deployer
+    namespace: cpd-jenkins
+  userNames:
+  - system:serviceaccount:cpd-jenkins:deployer
+- apiVersion: v1
+  groupNames: null
+  kind: RoleBinding
+  metadata:
+    creationTimestamp: null
+    name: system:image-builders
+  roleRef:
+    name: system:image-builder
+  subjects:
+  - kind: ServiceAccount
+    name: builder
+    namespace: cpd-jenkins
+  userNames:
+  - system:serviceaccount:cpd-jenkins:builder
+- apiVersion: v1
+  groupNames:
+  - system:serviceaccounts:cpd-jenkins
+  kind: RoleBinding
+  metadata:
+    creationTimestamp: null
+    name: system:image-pullers
+  roleRef:
+    name: system:image-puller
+  subjects:
+  - kind: SystemGroup
+    name: system:serviceaccounts:cpd-jenkins
+  userNames: null
+kind: List
+metadata: {}

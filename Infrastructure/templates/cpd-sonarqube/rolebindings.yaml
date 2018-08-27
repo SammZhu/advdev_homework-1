@@ -1,0 +1,71 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  groupNames: null
+  kind: RoleBinding
+  metadata:
+    creationTimestamp: null
+    name: admin
+  roleRef:
+    name: admin
+  subjects:
+  - kind: User
+    name: carl.durrant-avocado.com.au
+  userNames:
+  - carl.durrant-avocado.com.au
+- apiVersion: v1
+  groupNames: null
+  kind: RoleBinding
+  metadata:
+    creationTimestamp: null
+    name: admin-0
+  roleRef:
+    name: admin
+  subjects:
+  - kind: User
+    name: carl.durrant-avocado.com.au
+  userNames:
+  - carl.durrant-avocado.com.au
+- apiVersion: v1
+  groupNames: null
+  kind: RoleBinding
+  metadata:
+    creationTimestamp: null
+    name: system:deployers
+  roleRef:
+    name: system:deployer
+  subjects:
+  - kind: ServiceAccount
+    name: deployer
+    namespace: cpd-sonarqube
+  userNames:
+  - system:serviceaccount:cpd-sonarqube:deployer
+- apiVersion: v1
+  groupNames: null
+  kind: RoleBinding
+  metadata:
+    creationTimestamp: null
+    name: system:image-builders
+  roleRef:
+    name: system:image-builder
+  subjects:
+  - kind: ServiceAccount
+    name: builder
+    namespace: cpd-sonarqube
+  userNames:
+  - system:serviceaccount:cpd-sonarqube:builder
+- apiVersion: v1
+  groupNames:
+  - system:serviceaccounts:cpd-sonarqube
+  kind: RoleBinding
+  metadata:
+    creationTimestamp: null
+    name: system:image-pullers
+  roleRef:
+    name: system:image-puller
+  subjects:
+  - kind: SystemGroup
+    name: system:serviceaccounts:cpd-sonarqube
+  userNames: null
+kind: List
+metadata: {}

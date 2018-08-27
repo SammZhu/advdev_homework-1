@@ -1,0 +1,178 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  groupNames: null
+  kind: RoleBinding
+  metadata:
+    creationTimestamp: null
+    name: admin
+  roleRef:
+    name: admin
+  subjects:
+  - kind: User
+    name: carl.durrant-avocado.com.au
+  userNames:
+  - carl.durrant-avocado.com.au
+- apiVersion: v1
+  groupNames: null
+  kind: RoleBinding
+  metadata:
+    creationTimestamp: null
+    name: admin-0
+  roleRef:
+    name: admin
+  subjects:
+  - kind: User
+    name: carl.durrant-avocado.com.au
+  userNames:
+  - carl.durrant-avocado.com.au
+- apiVersion: v1
+  groupNames: null
+  kind: RoleBinding
+  metadata:
+    creationTimestamp: null
+    name: admin-1
+  roleRef:
+    name: admin
+  subjects:
+  - kind: User
+    name: carl.durrant-avocado.com.au
+  userNames:
+  - carl.durrant-avocado.com.au
+- apiVersion: v1
+  groupNames:
+  - system:serviceaccounts:jenkins
+  kind: RoleBinding
+  metadata:
+    creationTimestamp: null
+    name: admin-2
+  roleRef:
+    name: admin
+  subjects:
+  - kind: SystemGroup
+    name: system:serviceaccounts:jenkins
+  userNames: null
+- apiVersion: v1
+  groupNames:
+  - system:serviceaccounts:jenkins
+  kind: RoleBinding
+  metadata:
+    creationTimestamp: null
+    name: admin-3
+  roleRef:
+    name: admin
+  subjects:
+  - kind: SystemGroup
+    name: system:serviceaccounts:jenkins
+  userNames: null
+- apiVersion: v1
+  groupNames: null
+  kind: RoleBinding
+  metadata:
+    creationTimestamp: null
+    name: edit
+  roleRef:
+    name: edit
+  subjects:
+  - kind: SystemUser
+    name: system:serviceaccount:jenkins
+  userNames:
+  - system:serviceaccount:jenkins
+- apiVersion: v1
+  groupNames: null
+  kind: RoleBinding
+  metadata:
+    creationTimestamp: null
+    name: edit-0
+  roleRef:
+    name: edit
+  subjects:
+  - kind: ServiceAccount
+    name: jenkins
+    namespace: cicd
+  userNames:
+  - system:serviceaccount:cicd:jenkins
+- apiVersion: v1
+  groupNames: null
+  kind: RoleBinding
+  metadata:
+    creationTimestamp: null
+    name: edit-1
+  roleRef:
+    name: edit
+  subjects:
+  - kind: ServiceAccount
+    name: jenkins
+    namespace: cpd-jenkins
+  userNames:
+  - system:serviceaccount:cpd-jenkins:jenkins
+- apiVersion: v1
+  groupNames: null
+  kind: RoleBinding
+  metadata:
+    creationTimestamp: null
+    name: system:deployers
+  roleRef:
+    name: system:deployer
+  subjects:
+  - kind: ServiceAccount
+    name: deployer
+    namespace: cpd-parks-dev
+  userNames:
+  - system:serviceaccount:cpd-parks-dev:deployer
+- apiVersion: v1
+  groupNames: null
+  kind: RoleBinding
+  metadata:
+    creationTimestamp: null
+    name: system:image-builders
+  roleRef:
+    name: system:image-builder
+  subjects:
+  - kind: ServiceAccount
+    name: builder
+    namespace: cpd-parks-dev
+  userNames:
+  - system:serviceaccount:cpd-parks-dev:builder
+- apiVersion: v1
+  groupNames:
+  - system:serviceaccounts:cpd-parks-prod
+  kind: RoleBinding
+  metadata:
+    creationTimestamp: null
+    name: system:image-puller
+  roleRef:
+    name: system:image-puller
+  subjects:
+  - kind: SystemGroup
+    name: system:serviceaccounts:cpd-parks-prod
+  userNames: null
+- apiVersion: v1
+  groupNames:
+  - system:serviceaccounts:cpd-parks-dev
+  kind: RoleBinding
+  metadata:
+    creationTimestamp: null
+    name: system:image-pullers
+  roleRef:
+    name: system:image-puller
+  subjects:
+  - kind: SystemGroup
+    name: system:serviceaccounts:cpd-parks-dev
+  userNames: null
+- apiVersion: v1
+  groupNames: null
+  kind: RoleBinding
+  metadata:
+    creationTimestamp: null
+    name: view
+  roleRef:
+    name: view
+  subjects:
+  - kind: ServiceAccount
+    name: default
+    namespace: cpd-parks-dev
+  userNames:
+  - system:serviceaccount:cpd-parks-dev:default
+kind: List
+metadata: {}
