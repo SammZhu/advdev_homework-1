@@ -10,6 +10,10 @@ fi
 GUID=$1
 echo "Resetting Parks Production Environment in project ${GUID}-parks-prod to Blue Services"
 
+# Allow edit for ${GUID}-jenkins project jenkins service account
+oc policy add-role-to-user edit system:serviceaccount:${GUID}-jenkins:jenkins -n ${GUID}-parks-dev
+oc policy add-role-to-user edit system:serviceaccount:${GUID}-jenkins:jenkins -n ${GUID}-parks-prod
+
 # Reset MLBParks Production to blue deployment 
 # Delete configmap and re-create with Blue APPNAME
 oc delete configmap mlbparks-config -n ${GUID}-parks-prod --ignore-not-found=true
