@@ -12,19 +12,17 @@ REPO=$2
 CLUSTER=$3
 echo "Setting up Jenkins in project ${GUID}-jenkins from Git Repo ${REPO} for Cluster ${CLUSTER}"
 
-# Create Jenkins objects from templates
-oc create -f project.yaml -n ${GUID}-jenkins
-oc create -f serviceaccounts.yaml -n ${GUID}-jenkins
-oc create -f pvc.yaml -n ${GUID}-jenkins
-oc create -f rolebindings.yaml -n ${GUID}-jenkins
+# Create master Jenkins build
+oc new-app jenkins-persistent --param ENABLE_OAUTH=true --param MEMORY_LIMIT=4Gi --param VOLUME_CAPACITY=4Gi -n ${GUID}-jenkins
 
-# Create the maven slave pod 
-oc new-build --name=maven-slave-pod \
-    --dockerfile="$(< ./Infrastructure/templates/jenkins/Dockerfile)" \
-    -n $GUID-jenkins
+# Adjust readiness probe for Jenkins
+oc set probe dc jenkins --readiness --initial-delay-seconds=300 -n ${GUID}-jenkins
 
-# Set latest tag 
-oc tag jenkins-slave-maven-skopeo-centos7 jenkins-slave-maven-skopeo-centos7:latest -n ${GUID}-jenkins
+# Setup Jenkins Mavin ImageStream for Jenkins slave builds
+oc new-build --name=jenkins-slave-maven-skopeo-centos7 -D $'FROM openshift/jenkins-slave-maven-centos7:v3.9\nUSER root\nRUN yum -y install skopeo apb && yum clean all\nUSER 1001' -n ${GUID}-jenkins
+
+# Sleep 30 seconds for Image Stream to be created
+sleep 30
 
 # Wait for Jenkins to deploy and become ready
 while : ; do
@@ -35,9 +33,13 @@ while : ; do
   sleep 20
 done
 
+# Add version 3.9 tag to Jenkins slave ImageStream
+oc tag jenkins-slave-maven-skopeo-centos7:latest jenkins-slave-maven-skopeo-centos7:v3.9 -n ${GUID}-jenkins
 
+# Label Jenkins slave ImageStream for Jenkins to use for slave builds
+oc label imagestream jenkins-slave-maven-skopeo-centos7 role=jenkins-slave -n ${GUID}-jenkins
 
-# * GUID: the GUID used in all the projects
-# * CLUSTER: the base url of the cluster used (e.g. na39.openshift.opentlc.com)
-
-# To be Implemented by Student
+# Create the three pipeline build configs
+sed "s/GUID_VARIABLE/${GUID}/g;s/CLUSTER_VARIABLE/${CLUSTER}/g" ./Infrastructure/templates/mlbparks-pipeline_template_build.yaml | oc process -f - | oc create -f - -n ${GUID}-jenkins
+sed "s/GUID_VARIABLE/${GUID}/g;s/CLUSTER_VARIABLE/${CLUSTER}/g" ./Infrastructure/templates/nationalparks-pipeline_template_build.yaml | oc process -f - | oc create -f - -n ${GUID}-jenkins
+sed "s/GUID_VARIABLE/${GUID}/g;s/CLUSTER_VARIABLE/${CLUSTER}/g" ./Infrastructure/templates/parksmap-pipeline_template_build.yaml | oc process -f - | oc create -f - -n ${GUID}-jenkins
