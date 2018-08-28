@@ -81,7 +81,7 @@
     sh "oc delete configmap mlbparks-config -n cpd-parks-dev --ignore-not-found=true"
 
     sh "oc create configmap mlbparks-config \
-                  --from-literal=APPNAME='MLB Parks (Blue)' \
+                  --from-literal=APPNAME='MLB Parks (Dev)' \
                   --from-literal=DB_HOST=mongodb \
                   --from-literal=DB_NAME=parks \
                   --from-literal=DB_PASSWORD=mongodb \
