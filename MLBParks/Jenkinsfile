@@ -102,7 +102,7 @@
     echo "Running Integration Tests"
 
     // Waiting for Application
-    sleep 15
+    sleep 40
     // Curl status of application with /wz/health/ URL
     sh "curl http://mlbparks-cpd-parks-dev.apps.na39.openshift.opentlc.com/ws/healthz/ | grep -q 'OK'"
     // Curl endpoint to load data from application into backend database
