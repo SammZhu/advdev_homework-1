@@ -98,7 +98,7 @@
     }
 
     // Run Integration Tests in the Development Environment
-    stage('Run Integration Test') {
+    stage('Run Integration Tests') {
     echo "Running Integration Tests"
     
      // Waiting for Application
