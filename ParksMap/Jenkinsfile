@@ -81,7 +81,7 @@
     sh "oc delete configmap parksmap-config -n cpd-parks-dev --ignore-not-found=true"
 
     sh "oc create configmap parksmap-config \
-                  --from-literal=APPNAME='ParksMap (Blue)' -n cpd-parks-dev"
+                  --from-literal=APPNAME='ParksMap (Dev)' -n cpd-parks-dev"
 
     sh "oc set env dc/parksmap --from=configmap/parksmap-config -n cpd-parks-dev" 
 
