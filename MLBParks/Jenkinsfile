@@ -100,11 +100,13 @@
     // Run Integration Tests in the Development Environment
     stage('Run Integration Test') {
     echo "Running Integration Tests"
-    sleep 3
 
-    // 
-    echo "Testing health endpoint"
-    sh "curl GET http://mlbparks.cpd-parks-dev.svc:8080/ws/healthz/"
+    // Waiting for Application
+    sleep 15
+    // Curl status of application with /wz/health/ URL
+    sh "curl http://mlbparks.cpd-parks-dev.svc.cluster.local:8080/ws/healthz/ | grep -q 'OK'"
+    // Curl endpoint to load data from application into backend database
+    sh "curl http://mlbparks.cpd-parks-dev.svc.cluster.local:8080/ws/data/load/ | grep -q 'Items inserted in database: 30'"
     }
 
     // Copy Image to Nexus Docker Registry
