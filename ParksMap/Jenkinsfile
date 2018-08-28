@@ -77,6 +77,14 @@
     // Update the Image on the Development Deployment Config
     sh "oc set image dc/parksmap parksmap=docker-registry.default.svc:5000/cpd-parks-dev/parksmap:${devTag} -n cpd-parks-dev"
 
+    // Update the Config Map which contains the config for the mlbparks application
+    sh "oc delete configmap parksmap-config -n cpd-parks-dev --ignore-not-found=true"
+
+    sh "oc create configmap mlbparks-config \
+                  --from-literal=APPNAME='MLB Parks (Dev)' -n cpd-parks-dev"
+
+    sh "oc set env dc/parksmap --from=configmap/parksmap-config -n cpd-parks-dev" 
+
     // Deploy the development application
     openshiftDeploy depCfg: 'parksmap', namespace: 'cpd-parks-dev', verbose: 'false', waitTime: '', waitUnit: 'sec'
     openshiftVerifyDeployment depCfg: 'parksmap', namespace: 'cpd-parks-dev', replicaCount: '1', verbose: 'false', verifyReplicaCount: 'false', waitTime: '', waitUnit: 'sec'
@@ -90,7 +98,7 @@
 
     // 
     echo "Testing health endpoint"
-    sh "curl GET http://parksmap.cpd-parks-dev.svc:8080/ws/healthz/"
+    sh "curl http://parksmap.cpd-parks-dev.svc:8080/ws/healthz/ | grep -q 'OK'"
     }
 
     // Copy Image to Nexus Docker Registry
