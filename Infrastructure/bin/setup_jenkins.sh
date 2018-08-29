@@ -20,7 +20,7 @@ oc policy add-role-to-user edit system:serviceaccount:cpd-jenkins:jenkins -n ${G
 oc policy add-role-to-user edit system:serviceaccount:cpd-jenkins:jenkins -n ${GUID}-parks-prod
 
 # Adjust readiness probe for Jenkins
-oc set probe dc jenkins --readiness --initial-delay-seconds=300 -n ${GUID}-jenkins
+oc set probe dc jenkins --readiness --initial-delay-seconds=900 -n ${GUID}-jenkins
 
 # Setup Jenkins Maven ImageStream for Jenkins slave builds
 oc new-build --name=maven-slave-pod -D $'FROM openshift/jenkins-slave-maven-centos7:v3.9\nUSER root\nRUN yum -y install skopeo apb && yum clean all\nUSER 1001' -n ${GUID}-jenkins
@@ -30,7 +30,7 @@ sleep 30
 
 # Wait for Jenkins to deploy and become ready
 while : ; do
-  echo "Checking if Jenkins pod is Ready..."
+  echo "Checking if Jenkins is Ready..."
   oc get pod -n ${GUID}-jenkins | grep -v "deploy\|build" | grep -q "1/1"
   [[ "$?" == "1" ]] || break
   echo "... not quite yet. Sleeping 20 seconds."
