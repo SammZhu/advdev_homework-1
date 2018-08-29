@@ -12,14 +12,19 @@ REPO=$2
 CLUSTER=$3
 echo "Setting up Jenkins in project ${GUID}-jenkins from Git Repo ${REPO} for Cluster ${CLUSTER}"
 
-# Create master Jenkins build
+# Create a Jenkins instance with persistent storage and sufficient resources
 oc new-app jenkins-persistent --param ENABLE_OAUTH=true --param MEMORY_LIMIT=4Gi --param VOLUME_CAPACITY=4Gi -n ${GUID}-jenkins
+
+# Allow Jenkins service account to access the dev and prod projects 
+oc policy add-role-to-user edit system:serviceaccount:cpd-jenkins:jenkins -n ${GUID}-parks-dev
+oc policy add-role-to-user edit system:serviceaccount:cpd-jenkins:jenkins -n ${GUID}-parks-prod
 
 # Adjust readiness probe for Jenkins
 oc set probe dc jenkins --readiness --initial-delay-seconds=300 -n ${GUID}-jenkins
 
-# Setup Jenkins Mavin ImageStream for Jenkins slave builds
-oc new-build --name=jenkins-slave-maven-skopeo-centos7 -D $'FROM openshift/jenkins-slave-maven-centos7:v3.9\nUSER root\nRUN yum -y install skopeo apb && yum clean all\nUSER 1001' -n ${GUID}-jenkins
+
+# Setup Jenkins Maven ImageStream for Jenkins slave builds
+oc new-build --name=maven-slave-pod -D $'FROM openshift/jenkins-slave-maven-centos7:v3.9\nUSER root\nRUN yum -y install skopeo apb && yum clean all\nUSER 1001' -n ${GUID}-jenkins
 
 # Sleep 30 seconds for Image Stream to be created
 sleep 30
@@ -34,10 +39,8 @@ while : ; do
 done
 
 # Add version 3.9 tag to Jenkins slave ImageStream
-oc tag jenkins-slave-maven-skopeo-centos7:latest jenkins-slave-maven-skopeo-centos7:v3.9 -n ${GUID}-jenkins
+oc tag maven-slave-pod:latest maven-slave-pod:v3.9 -n ${GUID}-jenkins
 
-# Label Jenkins slave ImageStream for Jenkins to use for slave builds
-oc label imagestream jenkins-slave-maven-skopeo-centos7 role=jenkins-slave -n ${GUID}-jenkins
 
 # Create the three pipeline build configs
 sed "s/GUID_VARIABLE/${GUID}/g;s/CLUSTER_VARIABLE/${CLUSTER}/g" ./Infrastructure/templates/mlbparks-pipeline_template_build.yaml | oc process -f - | oc create -f - -n ${GUID}-jenkins

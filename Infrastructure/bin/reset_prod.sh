@@ -10,15 +10,24 @@ fi
 GUID=$1
 echo "Resetting Parks Production Environment in project ${GUID}-parks-prod to Green Services"
 
+# Delete the mlbparks blue service
+oc delete svc mlbparks-blue -n ${GUID}-parks-prod    
+
 # Change MLBparks route 
 oc patch route/mlbparks \
     -p '{"spec":{"to":{"name":"mlbparks-green"}}}' \
     -n $GUID-parks-prod || echo "MLBParks already green"
 
-# Change National Parks route 
+# Delete the nationalparks blue service
+oc delete svc nationalparks-blue -n ${GUID}-parks-prod
+
+# Change nationalparks route 
 oc patch route/nationalparks \
     -p '{"spec":{"to":{"name":"nationalparks-green"}}}' \
     -n $GUID-parks-prod || echo "NationalParks already green"
+
+# Delete the parksmap blue service
+oc delete svc parksmap-blue -n ${GUID}-parks-prod    
 
 # Switch parksmap frontend to green
 oc patch route/parksmap \
