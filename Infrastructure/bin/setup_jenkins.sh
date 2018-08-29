@@ -22,7 +22,6 @@ oc policy add-role-to-user edit system:serviceaccount:cpd-jenkins:jenkins -n ${G
 # Adjust readiness probe for Jenkins
 oc set probe dc jenkins --readiness --initial-delay-seconds=300 -n ${GUID}-jenkins
 
-
 # Setup Jenkins Maven ImageStream for Jenkins slave builds
 oc new-build --name=maven-slave-pod -D $'FROM openshift/jenkins-slave-maven-centos7:v3.9\nUSER root\nRUN yum -y install skopeo apb && yum clean all\nUSER 1001' -n ${GUID}-jenkins
 
@@ -41,8 +40,12 @@ done
 # Add version 3.9 tag to Jenkins slave ImageStream
 oc tag maven-slave-pod:latest maven-slave-pod:v3.9 -n ${GUID}-jenkins
 
+# Create pipeline build configurations for each application
+oc create -f ./Infrastructure/templates/cpd-jenkins/mlbparks-pipeline.yaml -n ${GUID}-jenkins
+oc create -f ./Infrastructure/templates/cpd-jenkins/nationalparks-pipeline.yaml -n ${GUID}-jenkins
+oc create -f ./Infrastructure/templates/cpd-jenkins/parksmap-pipeline.yaml -n ${GUID}-jenkins
 
-# Create the three pipeline build configs
-sed "s/GUID_VARIABLE/${GUID}/g;s/CLUSTER_VARIABLE/${CLUSTER}/g" ./Infrastructure/templates/mlbparks-pipeline_template_build.yaml | oc process -f - | oc create -f - -n ${GUID}-jenkins
-sed "s/GUID_VARIABLE/${GUID}/g;s/CLUSTER_VARIABLE/${CLUSTER}/g" ./Infrastructure/templates/nationalparks-pipeline_template_build.yaml | oc process -f - | oc create -f - -n ${GUID}-jenkins
-sed "s/GUID_VARIABLE/${GUID}/g;s/CLUSTER_VARIABLE/${CLUSTER}/g" ./Infrastructure/templates/parksmap-pipeline_template_build.yaml | oc process -f - | oc create -f - -n ${GUID}-jenkins
+# set environmental variables in build configs for pipeline: GUID, Cluster
+oc set env bc/mlbparks-pipeline GUID=${GUID} REPO=${REPO} CLUSTER=${CLUSTER} -n ${GUID}-jenkins
+oc set env bc/nationalparks-pipeline GUID=${GUID} REPO=${REPO} CLUSTER=${CLUSTER} -n ${GUID}-jenkins
+oc set env bc/parksmap-pipeline GUID=${GUID} REPO=${REPO} CLUSTER=${CLUSTER} -n ${GUID}-jenkins
