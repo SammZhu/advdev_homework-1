@@ -21,8 +21,8 @@ oc policy add-role-to-user edit system:serviceaccount:gpte-jenkins:jenkins -n ${
 oc policy add-role-to-user admin system:serviceaccount:gpte-jenkins:jenkins -n ${GUID}-parks-prod
 
 # spin up mongo db via stateful set
-oc new-app -f ../templates/cpd-parks-prod/mongodb_services.yaml -n ${GUID}-parks-prod
-oc create -f ../templates/cpd-parks-prod/mongodb_statefulset.yaml -n ${GUID}-parks-prod
+oc new-app -f ./Infrastructure/templates/cpd-parks-prod/mongodb_services.yaml -n ${GUID}-parks-prod
+oc create -f ./Infrastructure/templates/cpd-parks-prod/mongodb_statefulset.yaml -n ${GUID}-parks-prod
 
 oc expose svc/mongodb-internal -n ${GUID}-parks-prod
 oc expose svc/mongodb -n ${GUID}-parks-prod
