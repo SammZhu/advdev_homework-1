@@ -12,8 +12,6 @@ echo "Setting up Parks Production Environment in project ${GUID}-parks-prod"
 # Code to set up the parks production project. It will need a StatefulSet MongoDB, and two applications each (Blue/Green) for NationalParks, MLBParks and Parksmap.
 # The Green services/routes need to be active initially to guarantee a successful grading pipeline run.
 
-# To be Implemented by Student
-
 oc policy add-role-to-group system:image-puller system:serviceaccounts:${GUID}-parks-prod -n ${GUID}-parks-dev
 oc policy add-role-to-user edit system:serviceaccount:${GUID}-jenkins:jenkins -n ${GUID}-parks-prod
 oc policy add-role-to-user view --serviceaccount=default -n ${GUID}-parks-prod
@@ -23,8 +21,8 @@ oc policy add-role-to-user edit system:serviceaccount:gpte-jenkins:jenkins -n ${
 oc policy add-role-to-user admin system:serviceaccount:gpte-jenkins:jenkins -n ${GUID}-parks-prod
 
 # spin up mongo db via stateful set
-oc new-app -f ./Infrastructure/templates/cpd-parks-prod/mongodb_services.yaml -n ${GUID}-parks-prod
-oc create -f ./Infrastructure/templates/cpd-parks-prod/mongodb_statefulset.yaml -n ${GUID}-parks-prod
+oc new-app -f ../templates/cpd-parks-prod/mongodb_services.yaml -n ${GUID}-parks-prod
+oc create -f ../templates/cpd-parks-prod/mongodb_statefulset.yaml -n ${GUID}-parks-prod
 
 oc expose svc/mongodb-internal -n ${GUID}-parks-prod
 oc expose svc/mongodb -n ${GUID}-parks-prod
@@ -38,14 +36,12 @@ sleep 10
 oc new-app ${GUID}-parks-dev/mlbparks:0.0 --name=mlbparks-blue --allow-missing-imagestream-tags=true -n ${GUID}-parks-prod
 oc patch dc mlbparks-blue --patch='{ "spec": { "strategy": { "type": "Recreate" }}}' -n ${GUID}-parks-prod
 oc set triggers dc/mlbparks-blue --remove-all -n ${GUID}-parks-prod
-oc expose dc mlbparks-blue --port 8080 -n ${GUID}-parks-prod
-oc create configmap mlbparks-blue-config --from-literal="APPNAME=MLB Parks (Blue)" -n ${GUID}-parks-prod
 # Green
 oc new-app ${GUID}-parks-dev/mlbparks:0.0 --name=mlbparks-green --allow-missing-imagestream-tags=true -n ${GUID}-parks-prod
 oc patch dc mlbparks-green --patch='{ "spec": { "strategy": { "type": "Recreate" }}}' -n ${GUID}-parks-prod
 oc set triggers dc/mlbparks-green --remove-all -n ${GUID}-parks-prod
 oc expose dc mlbparks-green --port 8080 -n ${GUID}-parks-prod
-oc create configmap mlbparks-green-config --from-literal="APPNAME=MLB Parks (Green)" -n ${GUID}-parks-prod
+oc create configmap mlbparks-config --from-literal="APPNAME=MLB Parks (Green)" -n ${GUID}-parks-prod
 
 # National Parks
 # Blue
@@ -83,7 +79,7 @@ oc set env dc/nationalparks-blue DB_HOST=mongodb DB_PORT=27017 DB_USERNAME=mongo
 oc set env dc/parksmap-green --from=configmap/parksmap-green-config -n ${GUID}-parks-prod
 oc set env dc/parksmap-blue --from=configmap/parksmap-blue-config -n ${GUID}-parks-prod
 
-# expose Green service as route to make blue application active
+# expose Green service as route 
 oc expose svc/parksmap-green --name parksmap -n ${GUID}-parks-prod
 oc expose svc/mlbparks-green --name mlbparks -n ${GUID}-parks-prod
 oc expose svc/nationalparks-green --name nationalparks -n ${GUID}-parks-prod

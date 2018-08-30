@@ -40,7 +40,7 @@ oc new-app ${GUID}-parks-dev/parksmap:0.0-0 --name=parksmap --allow-missing-imag
 oc new-app ${GUID}-parks-dev/mlbparks:0.0-0 --name=mlbparks --allow-missing-imagestream-tags=true -n ${GUID}-parks-dev
 oc new-app ${GUID}-parks-dev/nationalparks:0.0-0 --name=nationalparks --allow-missing-imagestream-tags=true -n ${GUID}-parks-dev
 
-# set environmental variables for connecting to mongo db
+# set environmental variables for connecting to mongodb
 oc set env dc/mlbparks DB_HOST=mongodb DB_PORT=27017 DB_USERNAME=mongodb DB_PASSWORD=mongodb DB_NAME=mongodb DB_REPLICASET=rs0 --from=configmap/mlbparks-config -n ${GUID}-parks-dev
 oc set env dc/nationalparks DB_HOST=mongodb DB_PORT=27017 DB_USERNAME=mongodb DB_PASSWORD=mongodb DB_NAME=mongodb DB_REPLICASET=rs0 --from=configmap/nationalparks-config -n ${GUID}-parks-dev
 oc set env dc/parksmap --from=configmap/parksmap-config -n ${GUID}-parks-dev
