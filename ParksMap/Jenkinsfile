@@ -11,7 +11,7 @@
       name: "jnlp",
       image: "docker-registry.default.svc:5000/cpd-jenkins/maven-slave-pod",
       resourceRequestMemory: "1Gi",
-      resourceLimitMemory: "2Gi"
+      resourceLimitMemory: "1Gi"
     )
   ]
 ) {
