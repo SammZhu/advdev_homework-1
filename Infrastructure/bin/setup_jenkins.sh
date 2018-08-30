@@ -19,9 +19,8 @@ oc new-app jenkins-persistent --param ENABLE_OAUTH=true --param MEMORY_LIMIT=4Gi
 oc policy add-role-to-user edit system:serviceaccount:cpd-jenkins:jenkins -n ${GUID}-parks-dev
 oc policy add-role-to-user edit system:serviceaccount:cpd-jenkins:jenkins -n ${GUID}-parks-prod
 
-# Adjust probes for Jenkins
-oc set probe dc jenkins --liveness --initial-delay-seconds=1200 -n ${GUID}-jenkins
-oc set probe dc jenkins --readiness --initial-delay-seconds=1200 -n ${GUID}-jenkins
+# Adjust probe for Jenkins
+oc set probe dc jenkins --readiness --failure-threshold 6 --initial-delay-seconds=1200 --get-url=http://:8080/login -n ${GUID}-jenkins
 
 # Setup Jenkins Maven ImageStream for Jenkins slave builds
 oc new-build --name=maven-slave-pod -D $'FROM openshift/jenkins-slave-maven-centos7:v3.9\nUSER root\nRUN yum -y install skopeo apb && yum clean all\nUSER 1001' -n ${GUID}-jenkins
