@@ -19,7 +19,8 @@ oc new-app jenkins-persistent --param ENABLE_OAUTH=true --param MEMORY_LIMIT=4Gi
 oc policy add-role-to-user edit system:serviceaccount:cpd-jenkins:jenkins -n ${GUID}-parks-dev
 oc policy add-role-to-user edit system:serviceaccount:cpd-jenkins:jenkins -n ${GUID}-parks-prod
 
-# Adjust readiness probe for Jenkins
+# Adjust probes for Jenkins
+oc set probe dc jenkins --liveness --initial-delay-seconds=1200 -n ${GUID}-jenkins
 oc set probe dc jenkins --readiness --initial-delay-seconds=1200 -n ${GUID}-jenkins
 
 # Setup Jenkins Maven ImageStream for Jenkins slave builds
