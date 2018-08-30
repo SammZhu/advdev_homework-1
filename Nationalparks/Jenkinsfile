@@ -113,7 +113,7 @@
     // Copy Image to Nexus Docker Registry
     stage('Copy Image to Nexus Docker Registry') {
     echo "Copy image to Nexus Docker Registry"
-    sh "skopeo copy --src-tls-verify=false --dest-tls-verify=false --src-creds openshift:\$(oc whoami -t) --dest-creds admin:admin123 docker://docker-registry.default.svc.cluster.local:5000/cpd-parks-dev/nationalparks:${devTag} docker://nexus-registry.cpd-nexus.svc:5001/nationalparks:${devTag}"
+    sh "skopeo copy --src-tls-verify=false --dest-tls-verify=false --src-creds openshift:\$(oc whoami -t) --dest-creds admin:admin123 docker://docker-registry.default.svc.cluster.local:5000/cpd-parks-dev/nationalparks:${devTag} docker://nexus-registry.cpd-nexus.svc:5000/nationalparks:${devTag}"
 
     // Tag the built image with the production tag
     openshiftTag alias: 'false', destStream: 'nationalparks', destTag: prodTag, destinationNamespace: 'cpd-parks-dev', namespace: 'cpd-parks-dev', srcStream: 'nationalparks', srcTag: devTag, verbose: 'false'
