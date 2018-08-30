@@ -20,7 +20,7 @@ oc policy add-role-to-user edit system:serviceaccount:cpd-jenkins:jenkins -n ${G
 oc policy add-role-to-user edit system:serviceaccount:cpd-jenkins:jenkins -n ${GUID}-parks-prod
 
 # Adjust probe for Jenkins
-oc set probe dc jenkins --readiness --failure-threshold 6 --initial-delay-seconds=1200 --get-url=http://:8080/login -n ${GUID}-jenkins
+oc set probe dc jenkins --readiness --initial-delay-seconds=1200 --timeoutSeconds=480 -n ${GUID}-jenkins
 
 # Setup Jenkins Maven ImageStream for Jenkins slave builds
 oc new-build --name=maven-slave-pod -D $'FROM openshift/jenkins-slave-maven-centos7:v3.9\nUSER root\nRUN yum -y install skopeo apb && yum clean all\nUSER 1001' -n ${GUID}-jenkins
