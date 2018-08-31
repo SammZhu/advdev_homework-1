@@ -10,7 +10,7 @@
     containerTemplate(
       name: "jnlp",
       image: "docker-registry.default.svc:5000/cpd-jenkins/maven-slave-pod",
-      resourceRequestMemory: "1Gi",
+      resourceRequestMemory: "500Mi",
       resourceLimitMemory: "1Gi"
     )
   ]
