@@ -3,19 +3,19 @@
 // Jenkinsfile for NationalParks
 // Create a slave 
   podTemplate(
-  label: "nationalparks-build",
+  label: "maven-slave-pod",
   inheritFrom: "maven",
   cloud: "openshift",
   containers: [
     containerTemplate(
       name: "jnlp",
-      image: "docker-registry.default.svc:5000/cpd-jenkins/maven-slave-pod",
-      resourceRequestMemory: "500Mi",
-      resourceLimitMemory: "1Gi"
+      image: "docker-registry.default.svc:5000/${GUID}-jenkins/maven-slave-pod",
+      resourceRequestMemory: "1Gi",
+      resourceLimitMemory: "2Gi"
     )
   ]
 ) {
-  node('nationalparks-build') {
+  node('maven-slave-pod') {
 
     // Define Maven command
     def mvnCmd = "mvn -s ./nexus_settings.xml"
